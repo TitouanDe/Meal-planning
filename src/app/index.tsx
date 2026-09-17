@@ -8,7 +8,12 @@ import {
 
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { loadRecipes } from '../data/storage';
+
+import {
+  loadRecipes,
+  saveRecipes,
+} from '../data/storage';
+
 import { Recipe } from '../data/types';
 
 export default function HomeScreen() {
@@ -22,9 +27,7 @@ export default function HomeScreen() {
     useCallback(() => {
       const loadSavedRecipes = async () => {
         const savedRecipes = await loadRecipes();
-
         setRecipes(savedRecipes);
-
       };
 
       loadSavedRecipes();
@@ -37,6 +40,7 @@ export default function HomeScreen() {
   ) => {
     setPortions((current) => {
       const currentValue = current[recipeId] ?? 0;
+
       const newValue = Math.max(
         0,
         currentValue + amount
@@ -47,6 +51,16 @@ export default function HomeScreen() {
         [recipeId]: newValue,
       };
     });
+  };
+
+  const deleteRecipe = async (recipeId: string) => {
+    const updatedRecipes = recipes.filter(
+      (recipe) => recipe.id !== recipeId
+    );
+
+    setRecipes(updatedRecipes);
+
+    await saveRecipes(updatedRecipes);
   };
 
   return (
@@ -65,6 +79,7 @@ export default function HomeScreen() {
             Aucune recette pour le moment.
           </Text>
         )}
+
         {recipes.map((recipe) => {
           const recipePortions =
             portions[recipe.id] ?? 0;
@@ -89,46 +104,56 @@ export default function HomeScreen() {
                 )}
               </View>
 
-              <View style={styles.counter}>
-                <Pressable
-                  style={styles.counterButton}
-                  onPress={() =>
-                    changePortions(
-                      recipe.id,
-                      -1
-                    )
-                  }
-                >
-                  <Text
-                    style={
-                      styles.counterButtonText
+              <View style={styles.rightSection}>
+                <View style={styles.counter}>
+                  <Pressable
+                    style={styles.counterButton}
+                    onPress={() =>
+                      changePortions(
+                        recipe.id,
+                        -1
+                      )
                     }
                   >
-                    −
+                    <Text
+                      style={
+                        styles.counterButtonText
+                      }
+                    >
+                      −
+                    </Text>
+                  </Pressable>
+
+                  <Text style={styles.counterValue}>
+                    {recipePortions}
                   </Text>
-                </Pressable>
 
-                <Text
-                  style={styles.counterValue}
-                >
-                  {recipePortions}
-                </Text>
-
-                <Pressable
-                  style={styles.counterButton}
-                  onPress={() =>
-                    changePortions(
-                      recipe.id,
-                      1
-                    )
-                  }
-                >
-                  <Text
-                    style={
-                      styles.counterButtonText
+                  <Pressable
+                    style={styles.counterButton}
+                    onPress={() =>
+                      changePortions(
+                        recipe.id,
+                        1
+                      )
                     }
                   >
-                    +
+                    <Text
+                      style={
+                        styles.counterButtonText
+                      }
+                    >
+                      +
+                    </Text>
+                  </Pressable>
+                </View>
+
+                <Pressable
+                  onPress={() =>
+                    deleteRecipe(recipe.id)
+                  }
+                >
+                  <Text style={styles.deleteText}>
+                    🗑️
                   </Text>
                 </Pressable>
               </View>
@@ -137,16 +162,29 @@ export default function HomeScreen() {
         })}
       </ScrollView>
 
-      <Pressable
-        style={styles.addButton}
-        onPress={() =>
-          router.push('/recipe')
-        }
-      >
-        <Text style={styles.addButtonText}>
-          + Nouvelle recette
-        </Text>
-      </Pressable>
+      <View>
+        <Pressable
+          style={styles.ingredientButton}
+          onPress={() =>
+            router.push('/ingredients')
+          }
+        >
+          <Text style={styles.ingredientButtonText}>
+            🥕 Mes ingrédients
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.addButton}
+          onPress={() =>
+            router.push('/recipe')
+          }
+        >
+          <Text style={styles.addButtonText}>
+            + Nouvelle recette
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -196,6 +234,11 @@ const styles = StyleSheet.create({
     color: '#666',
   },
 
+  rightSection: {
+    alignItems: 'center',
+    gap: 8,
+  },
+
   counter: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -222,18 +265,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  addButton: {
-    backgroundColor: '#111',
-    padding: 16,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginTop: 16,
-  },
-
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  deleteText: {
+    fontSize: 20,
   },
 
   emptyText: {
@@ -243,4 +276,30 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
 
+  ingredientButton: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 16,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+
+  ingredientButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  addButton: {
+    backgroundColor: '#111',
+    padding: 16,
+    borderRadius: 14,
+    alignItems: 'center',
+  },
+
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

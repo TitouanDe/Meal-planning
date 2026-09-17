@@ -16,6 +16,14 @@ export default function RootLayout() {
           title: 'Nouvelle recette',
         }}
       />
+
+      <Stack.Screen
+        name="ingredients"
+        options={{
+          title: 'Mes ingrédients',
+        }}
+      />
+
     </Stack>
   );
 }

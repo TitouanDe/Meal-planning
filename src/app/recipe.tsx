@@ -7,18 +7,33 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { loadRecipes, saveRecipes } from '../data/storage';
-import { Recipe } from '../data/types';
+import {
+  loadIngredients,
+  loadRecipes,
+  saveRecipes,
+} from '../data/storage';
 
-import { useState } from 'react';
-import { initialIngredients } from '../data/initialData';
+import { Ingredient, Recipe } from '../data/types';
+
+import { useEffect, useState } from 'react';
 
 export default function RecipeScreen() {
   const [name, setName] = useState('');
 
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+
   const [ingredientPortions, setIngredientPortions] = useState<{
     [key: string]: number;
   }>({});
+
+  useEffect(() => {
+  const loadSavedIngredients = async () => {
+    const savedIngredients = await loadIngredients();
+    setIngredients(savedIngredients);
+  };
+
+  loadSavedIngredients();
+  }, []);
 
   const changeIngredientPortions = (
     ingredientId: string,
@@ -79,7 +94,7 @@ export default function RecipeScreen() {
       <Text style={styles.label}>Ingrédients</Text>
 
       <ScrollView style={styles.ingredientsList}>
-        {initialIngredients.map((ingredient) => {
+        {ingredients.map((ingredient) => {
           const portions = ingredientPortions[ingredient.id] ?? 0;
           const selected = portions > 0;
 
