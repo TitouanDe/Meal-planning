@@ -24,6 +24,13 @@ export default function RootLayout() {
         }}
       />
 
+      <Stack.Screen
+        name="shopping"
+        options={{
+          title: 'Liste de courses',
+        }}
+      />
+
     </Stack>
   );
 }

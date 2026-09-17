@@ -39,3 +39,34 @@ export async function loadIngredients(): Promise<Ingredient[]> {
 
   return JSON.parse(data);
 }
+
+const SELECTED_RECIPES_KEY = '@meal_planning_selected_recipes';
+
+export async function saveSelectedRecipes(
+  selectedRecipes: {
+    recipeId: string;
+    portions: number;
+  }[]
+) {
+  await AsyncStorage.setItem(
+    SELECTED_RECIPES_KEY,
+    JSON.stringify(selectedRecipes)
+  );
+}
+
+export async function loadSelectedRecipes(): Promise<
+  {
+    recipeId: string;
+    portions: number;
+  }[]
+> {
+  const data = await AsyncStorage.getItem(
+    SELECTED_RECIPES_KEY
+  );
+
+  if (!data) {
+    return [];
+  }
+
+  return JSON.parse(data);
+}

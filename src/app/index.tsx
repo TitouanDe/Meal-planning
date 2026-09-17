@@ -12,6 +12,7 @@ import { useCallback, useState } from 'react';
 import {
   loadRecipes,
   saveRecipes,
+  saveSelectedRecipes,
 } from '../data/storage';
 
 import { Recipe } from '../data/types';
@@ -34,7 +35,7 @@ export default function HomeScreen() {
     }, [])
   );
 
-  const changePortions = (
+  const changePortions = async (
     recipeId: string,
     amount: number
   ) => {
@@ -46,10 +47,23 @@ export default function HomeScreen() {
         currentValue + amount
       );
 
-      return {
+      const updatedPortions = {
         ...current,
         [recipeId]: newValue,
       };
+
+      const selectedRecipes = Object.entries(
+        updatedPortions
+      )
+        .filter(([_, portions]) => portions > 0)
+        .map(([recipeId, portions]) => ({
+          recipeId,
+          portions,
+        }));
+
+      saveSelectedRecipes(selectedRecipes);
+
+      return updatedPortions;
     });
   };
 
@@ -163,6 +177,18 @@ export default function HomeScreen() {
       </ScrollView>
 
       <View>
+
+        <Pressable
+          style={styles.shoppingButton}
+          onPress={() =>
+            router.push('/shopping')
+          }
+        >
+          <Text style={styles.shoppingButtonText}>
+            🛒 Liste de courses
+          </Text>
+        </Pressable>
+
         <Pressable
           style={styles.ingredientButton}
           onPress={() =>
@@ -194,7 +220,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 24,
-    paddingTop: 70,
+    paddingTop: 20,
   },
 
   title: {
@@ -302,4 +328,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+
+  shoppingButton: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 16,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+
+  shoppingButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
 });
