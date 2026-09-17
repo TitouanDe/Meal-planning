@@ -10,9 +10,11 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 
 import {
+    loadCheckedItems,
     loadIngredients,
     loadRecipes,
     loadSelectedRecipes,
+    saveCheckedItems,
 } from '../data/storage';
 
 import {
@@ -31,6 +33,10 @@ export default function ShoppingScreen() {
     ShoppingItem[]
   >([]);
 
+  const [checkedItems, setCheckedItems] = useState<
+  string[]
+  >([]);
+
   useFocusEffect(
     useCallback(() => {
       const generateShoppingList = async () => {
@@ -40,6 +46,11 @@ export default function ShoppingScreen() {
 
         const selectedRecipes =
             await loadSelectedRecipes();
+
+        const savedCheckedItems =
+            await loadCheckedItems();
+
+        setCheckedItems(savedCheckedItems);
 
         const totals: {
           [key: string]: number;
@@ -94,11 +105,53 @@ export default function ShoppingScreen() {
     }, [])
   );
 
+  const toggleChecked = async (
+    ingredientId: string
+  ) => {
+    const isChecked =
+        checkedItems.includes(ingredientId);
+
+    let updatedCheckedItems: string[];
+
+    if (isChecked) {
+        updatedCheckedItems =
+            checkedItems.filter(
+                (id) => id !== ingredientId
+            );
+    } else {
+        updatedCheckedItems = [
+        ...checkedItems,
+        ingredientId,
+        ];
+    }
+
+    setCheckedItems(updatedCheckedItems);
+
+    await saveCheckedItems(
+        updatedCheckedItems
+    );
+  };
+
+  const clearCheckedItems = async () => {
+    setCheckedItems([]);
+
+    await saveCheckedItems([]);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
         🛒 Liste de courses
       </Text>
+
+      <Pressable
+            style={styles.clearButton}
+            onPress={clearCheckedItems}
+        >
+            <Text style={styles.clearButtonText}>
+                ↻ Réinitialiser les achats
+            </Text>
+        </Pressable>
 
       <ScrollView style={styles.list}>
         {shoppingList.length === 0 && (
@@ -112,14 +165,30 @@ export default function ShoppingScreen() {
             key={item.ingredientId}
             style={styles.item}
           >
-            <Pressable style={styles.checkbox}>
-              <Text style={styles.checkboxText}>
-                ☐
-              </Text>
+            <Pressable
+            style={styles.checkbox}
+            onPress={() =>
+                toggleChecked(item.ingredientId)
+            }
+            >
+            <Text style={styles.checkboxText}>
+                {checkedItems.includes(
+                item.ingredientId
+                )
+                ? '☑'
+                : '☐'}
+            </Text>
             </Pressable>
 
-            <Text style={styles.ingredientName}>
-              {item.name}
+            <Text
+            style={[
+                styles.ingredientName,
+                checkedItems.includes(
+                item.ingredientId
+                ) && styles.checkedText,
+            ]}
+            >
+            {item.name}
             </Text>
 
             <Text style={styles.portions}>
@@ -185,4 +254,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 40,
   },
+
+  checkedText: {
+    textDecorationLine: 'line-through',
+    color: '#999',
+  },
+
+  clearButton: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+
+  clearButtonText: {
+    fontSize: 15,
+    color: '#555',
+  },
+
 });

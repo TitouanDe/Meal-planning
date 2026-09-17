@@ -11,6 +11,7 @@ import { useCallback, useState } from 'react';
 
 import {
   loadRecipes,
+  loadSelectedRecipes,
   saveRecipes,
   saveSelectedRecipes,
 } from '../data/storage';
@@ -26,12 +27,25 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      const loadSavedRecipes = async () => {
+      const loadSavedData = async () => {
         const savedRecipes = await loadRecipes();
+        const savedSelectedRecipes =
+          await loadSelectedRecipes();
+
         setRecipes(savedRecipes);
+
+        const savedPortions: {
+          [key: string]: number;
+        } = {};
+
+        savedSelectedRecipes.forEach((item) => {
+          savedPortions[item.recipeId] = item.portions;
+        });
+
+        setPortions(savedPortions);
       };
 
-      loadSavedRecipes();
+      loadSavedData();
     }, [])
   );
 

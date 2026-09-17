@@ -70,3 +70,26 @@ export async function loadSelectedRecipes(): Promise<
 
   return JSON.parse(data);
 }
+
+const CHECKED_ITEMS_KEY = '@meal_planning_checked_items';
+
+export async function saveCheckedItems(
+  checkedItems: string[]
+) {
+  await AsyncStorage.setItem(
+    CHECKED_ITEMS_KEY,
+    JSON.stringify(checkedItems)
+  );
+}
+
+export async function loadCheckedItems(): Promise<string[]> {
+  const data = await AsyncStorage.getItem(
+    CHECKED_ITEMS_KEY
+  );
+
+  if (!data) {
+    return [];
+  }
+
+  return JSON.parse(data);
+}
