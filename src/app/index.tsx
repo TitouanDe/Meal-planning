@@ -137,17 +137,10 @@ export default function HomeScreen() {
                   <Pressable
                     style={styles.counterButton}
                     onPress={() =>
-                      changePortions(
-                        recipe.id,
-                        -1
-                      )
+                      changePortions(recipe.id, -1)
                     }
                   >
-                    <Text
-                      style={
-                        styles.counterButtonText
-                      }
-                    >
+                    <Text style={styles.counterButtonText}>
                       −
                     </Text>
                   </Pressable>
@@ -159,31 +152,41 @@ export default function HomeScreen() {
                   <Pressable
                     style={styles.counterButton}
                     onPress={() =>
-                      changePortions(
-                        recipe.id,
-                        1
-                      )
+                      changePortions(recipe.id, 1)
                     }
                   >
-                    <Text
-                      style={
-                        styles.counterButtonText
-                      }
-                    >
+                    <Text style={styles.counterButtonText}>
                       +
                     </Text>
                   </Pressable>
                 </View>
 
-                <Pressable
-                  onPress={() =>
-                    deleteRecipe(recipe.id)
-                  }
-                >
-                  <Text style={styles.deleteText}>
-                    🗑️
-                  </Text>
-                </Pressable>
+                <View style={styles.actionButtons}>
+                  <Pressable
+                    onPress={() =>
+                      router.push({
+                        pathname: '/recipe',
+                        params: {
+                          recipeId: recipe.id,
+                        },
+                      })
+                    }
+                  >
+                    <Text style={styles.editText}>
+                      ✏️
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() =>
+                      deleteRecipe(recipe.id)
+                    }
+                  >
+                    <Text style={styles.deleteText}>
+                      🗑️
+                    </Text>
+                  </Pressable>
+                </View>
               </View>
             </View>
           );
@@ -355,6 +358,15 @@ const styles = StyleSheet.create({
   shoppingButtonText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+
+  actionButtons: {
+    flexDirection: 'row',
+  gap: 16,
+  },
+
+  editText: {
+    fontSize: 20,
   },
 
 });

@@ -1,4 +1,8 @@
-import { router } from 'expo-router';
+import {
+  router,
+  Stack,
+  useLocalSearchParams,
+} from 'expo-router';
 import {
   Pressable,
   ScrollView,
@@ -18,6 +22,16 @@ import { Ingredient, Recipe } from '../data/types';
 import { useEffect, useState } from 'react';
 
 export default function RecipeScreen() {
+
+  const { recipeId } =
+    useLocalSearchParams<{
+      recipeId?: string;
+  }>();
+
+  const isEditing =
+    typeof recipeId === 'string' &&
+    recipeId.length > 0;
+
   const [name, setName] = useState('');
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -27,13 +41,46 @@ export default function RecipeScreen() {
   }>({});
 
   useEffect(() => {
-  const loadSavedIngredients = async () => {
-    const savedIngredients = await loadIngredients();
-    setIngredients(savedIngredients);
-  };
+    const loadData = async () => {
+      const savedIngredients =
+        await loadIngredients();
 
-  loadSavedIngredients();
-  }, []);
+      setIngredients(savedIngredients);
+
+      if (isEditing) {
+        const savedRecipes =
+          await loadRecipes();
+
+        const recipeToEdit =
+          savedRecipes.find(
+            (recipe) =>
+              recipe.id === recipeId
+          );
+
+        if (recipeToEdit) {
+          setName(recipeToEdit.name);
+
+          const savedPortions: {
+            [key: string]: number;
+          } = {};
+
+          recipeToEdit.ingredients.forEach(
+            (ingredient) => {
+              savedPortions[
+                ingredient.ingredientId
+              ] = ingredient.portions;
+            }
+          );
+
+          setIngredientPortions(
+            savedPortions
+          );
+        }
+      }
+    };
+
+    loadData();
+  }, [recipeId, isEditing]);
 
   const changeIngredientPortions = (
     ingredientId: string,
@@ -55,32 +102,67 @@ export default function RecipeScreen() {
       return;
     }
 
-    const ingredients = Object.entries(ingredientPortions)
-      .filter(([_, portions]) => portions > 0)
-      .map(([ingredientId, portions]) => ({
-        ingredientId,
-        portions,
-    }));
+    const recipeIngredients =
+      Object.entries(ingredientPortions)
+        .filter(([_, portions]) => portions > 0)
+        .map(([ingredientId, portions]) => ({
+          ingredientId,
+          portions,
+        }));
 
-    const newRecipe: Recipe = {
-      id: Date.now().toString(),
-      name: name.trim(),
-      ingredients,
-    };
+    const existingRecipes =
+      await loadRecipes();
 
-    const existingRecipes = await loadRecipes();
+    if (isEditing) {
+      const updatedRecipes =
+        existingRecipes.map((recipe) =>
+          recipe.id === recipeId
+            ? {
+                ...recipe,
+                name: name.trim(),
+                ingredients:
+                  recipeIngredients,
+              }
+            : recipe
+        );
 
-    await saveRecipes([
-      ...existingRecipes,
-      newRecipe,
-    ]);
+      await saveRecipes(
+        updatedRecipes
+      );
+    } else {
+      const newRecipe: Recipe = {
+        id: Date.now().toString(),
+        name: name.trim(),
+        ingredients:
+          recipeIngredients,
+      };
+
+      await saveRecipes([
+        ...existingRecipes,
+        newRecipe,
+      ]);
+    }
 
     router.back();
   };
 
   return (
+
+    <>
+    <Stack.Screen
+      options={{
+        title: isEditing
+          ? 'Modifier la recette'
+          : 'Nouvelle recette',
+      }}
+    />
+
     <View style={styles.container}>
-      <Text style={styles.title}>Nouvelle recette</Text>
+      <Text style={styles.title}>
+        {isEditing
+          ? 'Modifier la recette'
+          : 'Nouvelle recette'}
+      </Text>
 
       <Text style={styles.label}>Nom de la recette</Text>
 
@@ -168,6 +250,7 @@ export default function RecipeScreen() {
         </Text>
       </Pressable>
     </View>
+    </>
   );
 }
 
