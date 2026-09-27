@@ -1,16 +1,19 @@
 import {
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 
 import { useEffect, useState } from 'react';
 import {
-    loadIngredients,
-    saveIngredients,
+  loadIngredients,
+  loadRecipes,
+  saveIngredients,
+  saveRecipes,
 } from '../data/storage';
 
 import { Ingredient } from '../data/types';
@@ -51,6 +54,52 @@ export default function IngredientsScreen() {
     setName('');
   };
 
+  const deleteIngredient = (ingredientId: string) => {
+    Alert.alert(
+      'Supprimer l’ingrédient',
+      'Cet ingrédient sera aussi retiré des recettes qui l’utilisent.',
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            const updatedIngredients =
+              ingredients.filter(
+                (ingredient) =>
+                  ingredient.id !== ingredientId
+              );
+
+            setIngredients(updatedIngredients);
+
+            await saveIngredients(
+              updatedIngredients
+            );
+
+            const recipes =
+              await loadRecipes();
+
+            const updatedRecipes =
+              recipes.map((recipe) => ({
+                ...recipe,
+                ingredients:
+                  recipe.ingredients.filter(
+                    (ingredient) =>
+                      ingredient.ingredientId !==
+                      ingredientId
+                  ),
+              }));
+
+            await saveRecipes(updatedRecipes);
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -84,6 +133,16 @@ export default function IngredientsScreen() {
             <Text style={styles.ingredientName}>
               {ingredient.name}
             </Text>
+
+            <Pressable
+              onPress={() =>
+                deleteIngredient(ingredient.id)
+              }
+            >
+              <Text style={styles.deleteText}>
+                🗑️
+              </Text>
+            </Pressable>
           </View>
         ))}
 
@@ -100,44 +159,47 @@ export default function IngredientsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 24,
-    paddingTop: 70,
+    backgroundColor: '#F7F8F5',
+    padding: 20,
   },
 
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 24,
+    fontSize: 30,
+    fontWeight: '800',
+    color: '#1F2A1F',
+    marginBottom: 20,
   },
 
   inputRow: {
     flexDirection: 'row',
     gap: 10,
-    marginBottom: 24,
+    marginBottom: 20,
   },
 
   input: {
     flex: 1,
+    height: 54,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
+    borderColor: '#E1E5DE',
+    borderRadius: 16,
     paddingHorizontal: 16,
     fontSize: 16,
   },
 
   addButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    backgroundColor: '#111',
+    width: 54,
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: '#2F7D32',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   addButtonText: {
-    color: '#fff',
-    fontSize: 28,
+    color: '#FFFFFF',
+    fontSize: 30,
+    fontWeight: '400',
   },
 
   list: {
@@ -145,20 +207,32 @@ const styles = StyleSheet.create({
   },
 
   ingredientCard: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     padding: 16,
     marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#E4E8E1',
   },
 
   ingredientName: {
+    flex: 1,
     fontSize: 17,
+    fontWeight: '600',
+    color: '#1F2A1F',
+  },
+
+  deleteText: {
+    fontSize: 20,
+    marginLeft: 12,
   },
 
   emptyText: {
     textAlign: 'center',
-    color: '#777',
+    color: '#7A827A',
     fontSize: 16,
     marginTop: 40,
   },

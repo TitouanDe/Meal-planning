@@ -1,25 +1,25 @@
 import {
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 
 import {
-    loadCheckedItems,
-    loadIngredients,
-    loadRecipes,
-    loadSelectedRecipes,
-    saveCheckedItems,
+  loadCheckedItems,
+  loadIngredients,
+  loadRecipes,
+  loadSelectedRecipes,
+  saveCheckedItems,
 } from '../data/storage';
 
 import {
-    Ingredient,
-    Recipe,
+  Ingredient,
+  Recipe,
 } from '../data/types';
 
 type ShoppingItem = {
@@ -205,15 +205,31 @@ export default function ShoppingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 24,
-    paddingTop: 20,
+    backgroundColor: '#F7F8F5',
+    padding: 20,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 24,
+    fontSize: 30,
+    fontWeight: '800',
+    color: '#1F2A1F',
+    marginBottom: 16,
+  },
+
+  clearButton: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E1E5DE',
+    padding: 13,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+
+  clearButtonText: {
+    fontSize: 15,
+    color: '#5F675F',
+    fontWeight: '600',
   },
 
   list: {
@@ -221,13 +237,14 @@ const styles = StyleSheet.create({
   },
 
   item: {
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 14,
+    borderRadius: 16,
     padding: 16,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#E4E8E1',
   },
 
   checkbox: {
@@ -235,43 +252,31 @@ const styles = StyleSheet.create({
   },
 
   checkboxText: {
-    fontSize: 24,
+    fontSize: 26,
   },
 
   ingredientName: {
     flex: 1,
     fontSize: 17,
-  },
-
-  portions: {
-    color: '#666',
-    fontSize: 15,
-  },
-
-  emptyText: {
-    textAlign: 'center',
-    color: '#777',
-    fontSize: 16,
-    marginTop: 40,
+    fontWeight: '600',
+    color: '#1F2A1F',
   },
 
   checkedText: {
     textDecorationLine: 'line-through',
-    color: '#999',
+    color: '#999999',
   },
 
-  clearButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-
-  clearButtonText: {
+  portions: {
+    color: '#6F776F',
     fontSize: 15,
-    color: '#555',
+    marginLeft: 10,
   },
 
+  emptyText: {
+    textAlign: 'center',
+    color: '#7A827A',
+    fontSize: 16,
+    marginTop: 50,
+  },
 });

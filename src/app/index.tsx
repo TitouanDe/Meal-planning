@@ -1,4 +1,5 @@
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -81,16 +82,43 @@ export default function HomeScreen() {
     });
   };
 
-  const deleteRecipe = async (recipeId: string) => {
-    const updatedRecipes = recipes.filter(
-      (recipe) => recipe.id !== recipeId
+  const deleteRecipe = (recipeId: string) => {
+    const recipe = recipes.find(
+      (item) => item.id === recipeId
     );
 
-    setRecipes(updatedRecipes);
+    if (!recipe) {
+      return;
+    }
 
-    await saveRecipes(updatedRecipes);
+    Alert.alert(
+      'Supprimer la recette',
+      `Voulez-vous vraiment supprimer "${recipe.name}" ?`,
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            const updatedRecipes =
+              recipes.filter(
+                (item) => item.id !== recipeId
+              );
+
+            setRecipes(updatedRecipes);
+
+            await saveRecipes(
+              updatedRecipes
+            );
+          },
+        },
+      ]
+    );
   };
-
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -202,7 +230,7 @@ export default function HomeScreen() {
           }
         >
           <Text style={styles.shoppingButtonText}>
-            🛒 Liste de courses
+            Liste de courses
           </Text>
         </Pressable>
 
@@ -213,7 +241,7 @@ export default function HomeScreen() {
           }
         >
           <Text style={styles.ingredientButtonText}>
-            🥕 Mes ingrédients
+            Mes ingrédients
           </Text>
         </Pressable>
 
@@ -235,21 +263,21 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 24,
-    paddingTop: 20,
+    backgroundColor: '#F7F8F5',
+    padding: 20,
   },
 
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontWeight: '800',
+    color: '#1F2A1F',
+    marginBottom: 4,
   },
 
   subtitle: {
-    fontSize: 20,
-    color: '#666',
-    marginBottom: 24,
+    fontSize: 18,
+    color: '#6B746B',
+    marginBottom: 20,
   },
 
   list: {
@@ -257,24 +285,34 @@ const styles = StyleSheet.create({
   },
 
   recipeCard: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
     padding: 16,
     marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
   },
 
   recipeName: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
+    color: '#1F2A1F',
   },
 
   portionText: {
     marginTop: 5,
-    color: '#666',
+    color: '#7A827A',
+    fontSize: 14,
   },
 
   rightSection: {
@@ -285,88 +323,98 @@ const styles = StyleSheet.create({
   counter: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
   },
 
   counterButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: '#eee',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#EEF2EA',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   counterButtonText: {
-    fontSize: 24,
+    fontSize: 22,
+    color: '#2F5D34',
   },
 
   counterValue: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
+    color: '#1F2A1F',
     minWidth: 20,
     textAlign: 'center',
   },
 
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+
+  editText: {
+    fontSize: 19,
+  },
+
   deleteText: {
-    fontSize: 20,
+    fontSize: 19,
   },
 
   emptyText: {
     textAlign: 'center',
-    color: '#777',
+    color: '#7A827A',
     fontSize: 16,
-    marginTop: 40,
-  },
-
-  ingredientButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 16,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-
-  ingredientButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-
-  addButton: {
-    backgroundColor: '#111',
-    padding: 16,
-    borderRadius: 14,
-    alignItems: 'center',
-  },
-
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    marginTop: 50,
   },
 
   shoppingButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 16,
-    borderRadius: 14,
+    backgroundColor: '#2F7D32',
+    padding: 17,
+    borderRadius: 16,
     alignItems: 'center',
     marginBottom: 10,
   },
 
   shoppingButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 
-  actionButtons: {
-    flexDirection: 'row',
-  gap: 16,
+  ingredientButton: {
+    backgroundColor: '#FFFFFF',
+    padding: 17,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginBottom: 10,
+
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
   },
 
-  editText: {
-    fontSize: 20,
+  ingredientButtonText: {
+    color: '#2F5D34',
+    fontSize: 16,
+    fontWeight: '700',
   },
 
+  addButton: {
+    backgroundColor: '#1F2A1F',
+    padding: 17,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+
+  addButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });

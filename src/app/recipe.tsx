@@ -11,6 +11,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+
 import {
   loadIngredients,
   loadRecipes,
@@ -175,7 +176,10 @@ export default function RecipeScreen() {
 
       <Text style={styles.label}>Ingrédients</Text>
 
-      <ScrollView style={styles.ingredientsList}>
+      <ScrollView
+        style={styles.ingredientsList}
+        keyboardShouldPersistTaps="handled"
+      >
         {ingredients.map((ingredient) => {
           const portions = ingredientPortions[ingredient.id] ?? 0;
           const selected = portions > 0;
@@ -257,30 +261,33 @@ export default function RecipeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 24,
-    paddingTop: 20,
+    backgroundColor: '#F7F8F5',
+    padding: 20,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 30,
+    fontSize: 30,
+    fontWeight: '800',
+    color: '#1F2A1F',
+    marginBottom: 20,
   },
 
   label: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    color: '#1F2A1F',
     marginBottom: 8,
   },
 
   input: {
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
-    padding: 14,
+    borderColor: '#E1E5DE',
+    borderRadius: 16,
+    height: 54,
+    paddingHorizontal: 16,
     fontSize: 16,
-    marginBottom: 24,
+    marginBottom: 20,
   },
 
   ingredientsList: {
@@ -288,88 +295,97 @@ const styles = StyleSheet.create({
   },
 
   ingredient: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 12,
     borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 12,
-    marginBottom: 8,
+    borderColor: '#E4E8E1',
   },
 
   ingredientSelected: {
-    borderColor: '#333',
+    borderColor: '#B8D4B9',
+    backgroundColor: '#F1F7F1',
   },
 
   ingredientInfo: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
   },
 
   checkbox: {
-    width: 24,
-    height: 24,
-    borderWidth: 1,
-    borderColor: '#bbb',
-    borderRadius: 6,
-    marginRight: 12,
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#C8CEC8',
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 12,
+    backgroundColor: '#FFFFFF',
   },
 
   checkboxSelected: {
-    backgroundColor: '#333',
-    borderColor: '#333',
+    backgroundColor: '#2F7D32',
+    borderColor: '#2F7D32',
   },
 
   check: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '800',
   },
 
   ingredientName: {
-    fontSize: 16,
+    flex: 1,
+    fontSize: 17,
+    color: '#1F2A1F',
+    fontWeight: '600',
   },
 
   counter: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
 
   counterButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#eee',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#EEF2EA',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   counterButtonText: {
-    fontSize: 20,
+    fontSize: 22,
+    color: '#2F7D32',
   },
 
   counterValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    minWidth: 18,
+    minWidth: 24,
     textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1F2A1F',
   },
 
   saveButton: {
-    backgroundColor: '#111',
-    padding: 16,
-    borderRadius: 14,
+    backgroundColor: '#2F7D32',
+    padding: 17,
+    borderRadius: 16,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 12,
   },
 
   saveButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });
